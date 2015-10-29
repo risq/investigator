@@ -15,6 +15,9 @@ export default class LogsList {
       tags: true,
       keys: true,
       mouse: true,
+      scrollbar: {
+        bg: 'magenta',
+      },
       style: {
         selected: {
           fg: 'black',
