@@ -174,5 +174,5 @@ const fakeMetas = {
     'twitter:image:width': '1200',
     'twitter:image:height': '1200'
   },
-  length: 26
+  length: 26,
 }

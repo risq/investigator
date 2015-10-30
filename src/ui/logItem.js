@@ -109,10 +109,10 @@ export default class LogItem {
 
   renderValue(value) {
     if (Array.isArray(value)) {
-      return `{cyan-fg}${prune(value, 2, 8).split('"-pruned-"').join(' ...')}{/cyan-fg}`;
+      return `{cyan-fg}${this.prune(value)}{/cyan-fg}`;
     }
     if (typeof value === 'object') {
-      return `{blue-fg}${prune(value, 2, 8).split('"-pruned-"').join(' ...')}{/blue-fg}`;
+      return `{blue-fg}${this.prune(value)}{/blue-fg}`;
     }
     if (typeof value === 'function') {
       return `{red-fg}{bold}[Function]{/bold}{red-fg}`
@@ -200,5 +200,13 @@ export default class LogItem {
   setStatus(status) {
     this.status = status;
     this.update();
+  }
+
+  prune(value) {
+    return prune(value, {
+      depthDecr: 2,
+      arrayMaxLength: 8,
+      prunedString: ' [...]'
+    });
   }
 }

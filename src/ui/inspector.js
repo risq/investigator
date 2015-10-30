@@ -4,8 +4,6 @@ import prune from 'json-prune';
 
 import tree from './tree';
 
-const MAX_DEPTH = 7;
-
 export default class Inspector {
   constructor() {
     this.channel = transceiver.channel('log');
@@ -42,7 +40,15 @@ export default class Inspector {
     this.opened = true;
     this.element.show();
     this.element.focus();
-    this.element.setData(this.formatData(JSON.parse(prune(selectedLog.data, MAX_DEPTH))));
+    this.element.setData(this.formatData(JSON.parse(prune(selectedLog.data, {
+      depthDecr: 7,
+      replacer: (value, defaultValue, circular) => {
+        if (typeof value === 'function') return '"Function [pruned]"';
+        if (Array.isArray(value)) return '"Array ('+value.length+') [pruned]"';
+        if (typeof value === 'object') return '"Object [pruned]"';
+        return defaultValue;
+      }
+    }))));
   }
 
   close() {
