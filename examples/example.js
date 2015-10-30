@@ -1,13 +1,16 @@
-var investigator = require('../src/investigator');
+import investigator from '../src/investigator';
 
-runScraping();
-var i = 1;
+let i = 1;
+setTimeout(runScraping, 2000);
 
 function runScraping() {
-  scrapPage('http://example.com');
-  setTimeout(() => {
-    runScraping();
-  }, Math.random() * 15000);
+  if (i < 5) {
+    i++;
+    scrapPage('http://example.com');
+    setTimeout(() => {
+      runScraping();
+    }, Math.random() * 15000);
+  }
 }
 
 function scrapPage(url) {

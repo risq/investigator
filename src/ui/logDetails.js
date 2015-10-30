@@ -38,7 +38,7 @@ export default class logDetails {
 
   renderType(log) {
     if (log.type === 'root') {
-      return '{magenta-fg}{bold}ROOT{/bold}{/magenta-fg}\n';
+      return '{magenta-fg}{bold}ROOT NODE{/bold}{/magenta-fg}\n';
     }
     if (log.type === 'success') {
       return '{green-fg}✔ {bold}SUCCESS{/bold}{/green-fg}\n';
@@ -49,18 +49,18 @@ export default class logDetails {
     if (log.type === 'warn') {
       return '{yellow-fg}! {bold}WARN{/bold}{/red-fg}\n';
     }
-    if (log.type === 'child') {
-      return '{grey-fg}{bold}CHILD{/bold}{/grey-fg}\n';
+    if (log.type === 'node') {
+      return '{grey-fg}{bold}NODE{/bold}{/grey-fg}\n';
     }
     if (log.type === 'async') {
       if (log.status === 'resolved') {
-        return '{bold}{green-fg}ASYNC CHILD{/bold} (RESOLVED ✔){/green-fg}\n';
+        return '{bold}{green-fg}ASYNC NODE{/bold} (RESOLVED ✔){/green-fg}\n';
       }
       if (log.status === 'rejected') {
-        return '{bold}{red-fg}ASYNC CHILD{/bold} (REJECTED ✘){/red-fg}\n';
+        return '{bold}{red-fg}ASYNC NODE{/bold} (REJECTED ✘){/red-fg}\n';
       }
       if (log.status === 'pending') {
-        return '{cyan-fg}{bold}ASYNC CHILD{/bold} (PENDING ⌛){/cyan-fg}\n';
+        return '{cyan-fg}{bold}ASYNC NODE{/bold} (PENDING ⌛){/cyan-fg}\n';
       }
     }
     if (log.type === 'info') {

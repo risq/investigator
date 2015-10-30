@@ -37,7 +37,7 @@ export default class LogItem {
   }
 
   render() {
-    let message = `${this.renderState()}${this.renderName()}${this.renderDate()}${this.renderMessage()}${this.renderData()}${this.renderDuration()}`;
+    let message = `${this.renderState()}${this.renderName()}${this.renderMessage()}${this.renderData()}${this.renderDate()}${this.renderDuration()}`;
     for (let i = 0; i < this.depth; i++) {
       message = '    ' + message;
     }

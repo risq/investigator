@@ -3,7 +3,7 @@ import transceiver from 'transceiver';
 
 import LogsList from './logsList';
 import LogDetails from './logDetails';
-import Inspecter from './inspecter';
+import Inspector from './inspector';
 
 export default class Ui {
   constructor() {
@@ -14,7 +14,7 @@ export default class Ui {
 
     this.logsList = new LogsList();
     this.logDetails = new LogDetails();
-    this.inspecter = new Inspecter();
+    this.inspector = new Inspector();
 
     this.separator = blessed.line({
       bottom: 6,
@@ -24,7 +24,7 @@ export default class Ui {
     this.screen.append(this.logsList.element);
     this.screen.append(this.logDetails.element);
     this.screen.append(this.separator);
-    this.screen.append(this.inspecter.element);
+    this.screen.append(this.inspector.element);
 
     this.logsList.element.focus();
 
@@ -32,19 +32,19 @@ export default class Ui {
       return process.exit(0);
     });
 
-    this.screen.key(['i'], this.toggleInspecter.bind(this));
+    this.screen.key(['i'], this.toggleInspector.bind(this));
 
     this.screen.render();
 
     this.channel.reply('render', () => this.screen.render());
   }
 
-  toggleInspecter() {
-    if (this.inspecter.opened) {
-      this.inspecter.close();
+  toggleInspector() {
+    if (this.inspector.opened) {
+      this.inspector.close();
       this.logsList.focus();
     } else {
-      this.inspecter.open(this.logsList.selectedLog);
+      this.inspector.open(this.logsList.selectedLog);
     }
     this.screen.render();
   }

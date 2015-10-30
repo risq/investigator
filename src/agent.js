@@ -72,7 +72,7 @@ class Agent {
     if (!this.children[name]) {
       this.children[name] = new Agent(name, {
         ancestors: this.ancestors.concat(this),
-        type: 'child'
+        type: 'node'
       });
     }
     if (args.length) {

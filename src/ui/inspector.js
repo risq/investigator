@@ -6,7 +6,7 @@ import tree from './tree';
 
 const MAX_DEPTH = 7;
 
-export default class Inspecter {
+export default class Inspector {
   constructor() {
     this.channel = transceiver.channel('log');
 
@@ -16,7 +16,7 @@ export default class Inspecter {
       width: '90%',
       height: '75%',
       hidden: true,
-      label: 'Inspecter',
+      label: 'Inspector',
       tags: true,
       border: {
         type: 'line'
