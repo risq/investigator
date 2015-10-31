@@ -36,7 +36,7 @@ class Agent {
       data: args,
       type: 'info',
       ancestors: this.ancestors.concat(this)
-    })
+    });
     return this;
   }
 
@@ -45,7 +45,7 @@ class Agent {
       data: args,
       type: 'warn',
       ancestors: this.ancestors.concat(this)
-    })
+    });
     return this;
   }
 
@@ -54,7 +54,7 @@ class Agent {
       data: args,
       type: 'success',
       ancestors: this.ancestors.concat(this)
-    })
+    });
     return this;
   }
 
@@ -63,7 +63,7 @@ class Agent {
       data: args,
       type: 'error',
       ancestors: this.ancestors.concat(this)
-    })
+    });
     return this;
   }
 
@@ -94,7 +94,7 @@ class Agent {
       }
       return this.children[name];
     }
-    this.internalWarn(`async(${name}): child agent has already been defined`)
+    this.internalWarn(`async(${name}): child agent has already been defined`);
     return this;
   }
 

@@ -38,7 +38,7 @@ function Tree(options) {
     tags: true,
   });
 
-  this.rows.key(options.keys,function(){
+  this.rows.key(options.keys,function() {
     self.nodeLines[this.getItemIndex(this.selected)].extended = !self.nodeLines[this.getItemIndex(this.selected)].extended;
     self.setData(self.data);
     self.screen.render();
@@ -46,15 +46,15 @@ function Tree(options) {
     self.emit('select',self.nodeLines[this.getItemIndex(this.selected)]);
   });
 
-  this.append(this.rows)
+  this.append(this.rows);
 }
 
-Tree.prototype.walk = function (node,treeDepth) {
-
+Tree.prototype.walk = function(node, treeDepth) {
   var lines = [];
 
-  if (!node.parent)
+  if (!node.parent) {
     node.parent = null;
+  }
 
   if (treeDepth == '' && node.name) {
     this.lineNbr = 0;
@@ -63,35 +63,40 @@ Tree.prototype.walk = function (node,treeDepth) {
     treeDepth = ' ';
   }
 
-  node.depth = treeDepth.length-1;
+  node.depth = treeDepth.length - 1;
 
   if (node.children && node.extended) {
 
     var i = 0;
 
-    if (typeof node.children == 'function')
+    if (typeof node.children == 'function') {
       node.childrenContent = node.children(node);
+    }
 
-    if(!node.childrenContent)
+    if (!node.childrenContent) {
       node.childrenContent = node.children;
+    }
 
     for (var child in node.childrenContent) {
 
-      if(!node.childrenContent[child].name)
+      if (!node.childrenContent[child].name) {
         node.childrenContent[child].name = child;
+      }
 
       var childIndex = child;
       child = node.childrenContent[child];
       child.parent = node;
       child.position = i++;
 
-      if(typeof child.extended == 'undefined')
+      if (typeof child.extended == 'undefined') {
         child.extended = this.options.extended;
+      }
 
-      if (typeof child.children == 'function')
+      if (typeof child.children == 'function') {
         child.childrenContent = child.children(child);
-      else
+      } else {
         child.childrenContent = child.children;
+      }
 
       var isLastChild = child.position == Object.keys(child.parent.childrenContent).length - 1;
       var tree;
@@ -101,9 +106,9 @@ Tree.prototype.walk = function (node,treeDepth) {
       } else {
         tree = '├';
       }
-      if (!child.childrenContent || Object.keys(child.childrenContent).length == 0){
+      if (!child.childrenContent || Object.keys(child.childrenContent).length == 0) {
         tree += '─';
-      } else if(child.extended) {
+      } else if (child.extended) {
         tree += '┬';
         suffix = this.options.template.retract;
       } else {
@@ -111,7 +116,7 @@ Tree.prototype.walk = function (node,treeDepth) {
         suffix = this.options.template.extend;
       }
 
-      if (!this.options.template.lines){
+      if (!this.options.template.lines) {
         tree = '|-';
       }
 
@@ -120,7 +125,7 @@ Tree.prototype.walk = function (node,treeDepth) {
       this.nodeLines[this.lineNbr++] = child;
 
       var parentTree;
-      if (isLastChild || !this.options.template.lines){
+      if (isLastChild || !this.options.template.lines) {
         parentTree = treeDepth + ' ';
       } else {
         parentTree = treeDepth + '│';
@@ -129,20 +134,21 @@ Tree.prototype.walk = function (node,treeDepth) {
     }
   }
   return lines;
-}
+};
 
-Tree.prototype.focus = function(){
+Tree.prototype.focus = function() {
   this.rows.focus();
-}
+};
 
 Tree.prototype.render = function() {
-  if(this.screen.focused == this.rows)
-    this.rows.focus()
+  if (this.screen.focused == this.rows) {
+    this.rows.focus();
+  }
 
-  this.rows.width = this.width-3;
-  this.rows.height = this.height-3;
+  this.rows.width = this.width - 3;
+  this.rows.height = this.height - 3;
   Box.prototype.render.call(this);
-}
+};
 
 Tree.prototype.setData = function(data) {
 
@@ -150,8 +156,8 @@ Tree.prototype.setData = function(data) {
   formatted = this.walk(data,'');
 
   this.data = data;
-  this.rows.setItems(formatted)
-}
+  this.rows.setItems(formatted);
+};
 
 Tree.prototype.__proto__ = Box.prototype;
 

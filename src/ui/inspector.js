@@ -43,9 +43,15 @@ export default class Inspector {
     this.element.setData(this.formatData(JSON.parse(prune(selectedLog.data, {
       depthDecr: 7,
       replacer: (value, defaultValue, circular) => {
-        if (typeof value === 'function') return '"Function [pruned]"';
-        if (Array.isArray(value)) return '"Array ('+value.length+') [pruned]"';
-        if (typeof value === 'object') return '"Object [pruned]"';
+        if (typeof value === 'function') {
+          return '"Function [pruned]"';
+        }
+        if (Array.isArray(value)) {
+          return `"Array (${value.length}) [pruned]"`;
+        }
+        if (typeof value === 'object') {
+          return '"Object [pruned]"';
+        }
         return defaultValue;
       }
     }))));

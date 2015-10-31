@@ -115,20 +115,20 @@ export default class LogItem {
       return `{blue-fg}${this.prune(value)}{/blue-fg}`;
     }
     if (typeof value === 'function') {
-      return `{red-fg}{bold}[Function]{/bold}{red-fg}`
+      return `{red-fg}{bold}[Function]{/bold}{red-fg}`;
     }
     if (typeof value === 'number') {
-      return `{yellow-fg}${value}{/yellow-fg}`
+      return `{yellow-fg}${value}{/yellow-fg}`;
     }
     if (typeof value === 'string') {
       if (this.type === 'success') {
-        return `{green-fg}${value}{/green-fg}`
+        return `{green-fg}${value}{/green-fg}`;
       }
       if (this.type === 'error') {
-        return `{red-fg}${value}{/red-fg}`
+        return `{red-fg}${value}{/red-fg}`;
       }
       if (this.type === 'warn') {
-        return `{yellow-fg}${value}{/yellow-fg}`
+        return `{yellow-fg}${value}{/yellow-fg}`;
       }
     }
     return value;
@@ -145,7 +145,7 @@ export default class LogItem {
       if (this.type === 'warn') {
         return `{yellow-fg}${this.message}{/yellow-fg} `;
       }
-      return `${this.message} `
+      return `${this.message} `;
     }
     return '';
   }
@@ -177,7 +177,7 @@ export default class LogItem {
       milliseconds = ('000' + milliseconds).slice(-3);
       return `${Math.floor(duration / 1000)}.${milliseconds}s`;
     }
-    return `${Math.floor(duration / 60000)}m ${Math.round((duration % 60000) / 1000)}s`
+    return `${Math.floor(duration / 60000)}m ${Math.round((duration % 60000) / 1000)}s`;
   }
 
   addChild(log) {

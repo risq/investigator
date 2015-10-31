@@ -86,7 +86,7 @@ export default class logDetails {
 
   renderData(log) {
     if (log.data) {
-      return `{bold}DATA:{/bold} ${log.renderData()}\n`
+      return `{bold}DATA:{/bold} ${log.renderData()}\n`;
     }
     return '';
   }
