@@ -66,7 +66,7 @@ export default class Inspector {
     depth++;
     if (typeof data === 'object') {
       if (data !== null) {
-        const type = (Array.isArray(data) ? '[Array]' : '[Object]');
+        const type = (Array.isArray(data) ? `[Array] {magenta-fg}(${data.length}){/magenta-fg}` : '[Object]');
         const keyName = key ? key + ' ' : '';
         const newObj = {
           children: {},
