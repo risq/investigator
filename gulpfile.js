@@ -46,8 +46,8 @@ function createLintTask(taskName, files) {
       .pipe($.eslint())
       .pipe($.eslint.format())
       .pipe($.eslint.failOnError())
-      // .pipe($.jscs())
-      // .pipe($.notify(jscsNotify));
+      .pipe($.jscs())
+      .pipe($.notify(jscsNotify));
   });
 }
 
@@ -138,7 +138,7 @@ function test() {
 gulp.task('coverage', ['lint-src', 'lint-test'], function(done) {
   require('babel-core/register');
   gulp.src(['src/**/*.js'])
-    .pipe($.istanbul({ instrumenter: isparta.Instrumenter }))
+    .pipe($.istanbul({instrumenter: isparta.Instrumenter}))
     .pipe($.istanbul.hookRequire())
     .on('finish', function() {
       return test()
@@ -168,7 +168,7 @@ const otherWatchFiles = ['package.json', '**/.eslintrc', '.jscsrc'];
 // Run the headless unit tests as you make changes.
 gulp.task('watch', function() {
   const watchFiles = jsWatchFiles.concat(otherWatchFiles);
-  gulp.watch(watchFiles/*, ['test']*/);
+  gulp.watch(watchFiles, ['test']);
 });
 
 // Set up a livereload environment for our spec runner
