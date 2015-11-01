@@ -4,75 +4,76 @@ import transceiver from 'transceiver';
 import LogItem from './ui/logItem';
 
 class Agent {
-  constructor(name, options = {}) {
+  constructor({name, type, status, data, message, isAsync = false, ancestors}) {
     this.name = name;
     this.children = {};
-    this.isAsync = options.isAsync ? true : false;
+    this.isAsync = isAsync;
     this.asyncState = this.isAsync ? 'pending' : null;
-    this.type = options.type;
-    this.status = options.status;
-    if (!options.ancestors) {
+    this.type = type;
+    this.status = status;
+
+    if (!ancestors) {
       this.ancestors = [];
       this.isRoot = true;
     } else {
-      this.ancestors = options.ancestors;
+      this.ancestors = ancestors;
       this.parent = this.ancestors[this.ancestors.length - 1];
     }
 
     this.logItem = new LogItem({
       name: this.name,
-      data: options.data,
-      message: options.message,
+      type: this.type,
       status: this.status,
       parent: this.parent ? this.parent.logItem : null,
-      type: this.type,
+      data: data,
+      message: message,
     });
 
     return this;
   }
 
   log(...args) {
-    new Agent(null, {
-      data: args,
+    new Agent({
       type: 'info',
+      data: args,
       ancestors: this.ancestors.concat(this)
     });
     return this;
   }
 
   warn(...args) {
-    new Agent(null, {
-      data: args,
+    new Agent({
       type: 'warn',
+      data: args,
       ancestors: this.ancestors.concat(this)
     });
     return this;
   }
 
   success(...args) {
-    new Agent(null, {
-      data: args,
+    new Agent({
       type: 'success',
-      ancestors: this.ancestors.concat(this)
+      data: args,
+      ancestors: this.ancestors.concat(this),
     });
     return this;
   }
 
   error(...args) {
-    new Agent(null, {
-      data: args,
+    new Agent({
       type: 'error',
-      ancestors: this.ancestors.concat(this)
+      data: args,
+      ancestors: this.ancestors.concat(this),
     });
     return this;
   }
 
   child(name, ...args) {
-    // console.log(this.ancestors, this)
     if (!this.children[name]) {
-      this.children[name] = new Agent(name, {
+      this.children[name] = new Agent({
+        name,
+        type: 'node',
         ancestors: this.ancestors.concat(this),
-        type: 'node'
       });
     }
     if (args.length) {
@@ -83,11 +84,12 @@ class Agent {
 
   async(name, ...args) {
     if (!this.children[name]) {
-      this.children[name] = new Agent(name, {
-        isAsync: true,
+      this.children[name] = new Agent({
+        name,
         type: 'async',
         status: 'pending',
-        ancestors: this.ancestors.concat(this)
+        isAsync: true,
+        ancestors: this.ancestors.concat(this),
       });
       if (args.length) {
         this.children[name].log(...args);
@@ -102,10 +104,11 @@ class Agent {
     if (this.isAsync) {
       if (this.logItem.status === 'pending') {
         this.logItem.setStatus('resolved');
-        const resolveLog = new Agent(this.name, {
-          ancestors: this.ancestors.concat(this),
+        const resolveLog = new Agent({
+          name: this.name,
           type: 'success',
           message: 'resolved',
+          ancestors: this.ancestors.concat(this),
         });
         if (args.length) {
           resolveLog.success(...args);
@@ -123,10 +126,11 @@ class Agent {
     if (this.isAsync) {
       if (this.logItem.status === 'pending') {
         this.logItem.setStatus('rejected');
-        const rejectLog = new Agent(this.name, {
-          ancestors: this.ancestors.concat(this),
+        const rejectLog = new Agent({
+          name: this.name,
           type: 'error',
           message: 'rejected',
+          ancestors: this.ancestors.concat(this),
         });
         if (args.length) {
           rejectLog.error(...args);
@@ -141,10 +145,11 @@ class Agent {
   }
 
   internalWarn(message) {
-    new Agent(this.name, {
-      ancestors: this.ancestors.concat(this),
+    new Agent({
+      name: this.name,
       type: 'warn',
       message,
+      ancestors: this.ancestors.concat(this),
     });
   }
 
@@ -154,8 +159,9 @@ class Agent {
 }
 
 export default function(name, ...args) {
-  return new Agent(name, {
-    data: args.length ? args : undefined,
+  return new Agent({
+    name,
     type: 'root',
+    data: args.length ? args : undefined,
   });
 };

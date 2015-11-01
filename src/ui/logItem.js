@@ -5,21 +5,21 @@ import prune from 'json-prune';
 import dateFormat from 'dateformat';
 
 export default class LogItem {
-  constructor(options) {
+  constructor({name, type, status, parent, data, message, date = Date.now()}) {
     this.id = shortid.generate();
-    this.data = options.data;
-    this.type = options.type;
-    this.status = options.status;
-    this.message = options.message;
-    this.name = options.name;
-    this.date = options.date || Date.now();
-    this.channel = transceiver.channel('log');
+    this.name = name;
+    this.type = type;
+    this.status = status;
+    this.data = data;
+    this.message = message;
+    this.date = date;
     this.children = [];
+    this.channel = transceiver.channel('log');
 
-    if (options.parent) {
-      this.depth = options.parent.depth + 1;
-      this.parent = options.parent;
-      this.previousLog = options.parent.getLastChild() || options.parent;
+    if (parent) {
+      this.depth = parent.depth + 1;
+      this.parent = parent;
+      this.previousLog = parent.getLastChild() || parent;
       this.relativeDuration = this.getRelativeDuration();
       this.parent.addChild(this);
     } else {
