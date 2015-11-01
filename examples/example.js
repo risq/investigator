@@ -34,7 +34,7 @@ function scrapPage(url) {
       getPostsData(res.data.posts, agent),
     ]);
   }).then(() => {
-    agent.resolve('Well done !')
+    agent.resolve('Well done !');
   });
 }
 
@@ -51,16 +51,17 @@ function getPostsData(posts, agent) {
           return img;
         }).catch((err) => postAgent.error(err)),
         getPostComments(post).then((comments) => {
-          if (comments.length)
-            postAgent.success(`Comments retrieved (${comments.length})`, comments)
-          else
+          if (comments.length) {
+            postAgent.success(`Comments retrieved (${comments.length})`, comments);
+          } else {
             postAgent.warn(`No comment found`);
+          }
           return comments;
         }),
       ]);
     }))
     .then((posts) => {
-      agent.child('getPosts').resolve(`${posts.length} posts retrieved`)
+      agent.child('getPosts').resolve(`${posts.length} posts retrieved`);
     });
 }
 
@@ -78,14 +79,12 @@ function getVideos(videos, agent) {
     }))
     .then((videos) => {
       agent.child('getVideos').resolve(`${videos.length} videos retrieved`)
-        .log(videos)
+        .log(videos);
     })
     .catch((err) => {
       agent.child('getVideos').reject(err);
     });
 }
-
-
 
 function downloadPage(url) {
   return new Promise((resolve) => setTimeout(resolve, Math.random() * 10000, {
@@ -124,7 +123,7 @@ function getPageInfo(page) {
     id: Math.round(Math.random() * 100),
     title: 'Lorem ipsum',
     metas: fakeMetas,
-  }
+  };
 }
 
 function downloadPostImage(post) {
@@ -175,4 +174,4 @@ const fakeMetas = {
     'twitter:image:height': '1200'
   },
   length: 26,
-}
+};
