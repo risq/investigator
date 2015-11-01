@@ -91,13 +91,14 @@ class Agent {
         isAsync: true,
         ancestors: this.ancestors.concat(this),
       });
-      if (args.length) {
-        this.children[name].log(...args);
-      }
-      return this.children[name];
     }
-    this.internalWarn(`async(${name}): child agent has already been defined`);
-    return this;
+    if (!this.children[name].isAsync) {
+      this.internalWarn(`Child agent {bold}${name}{/bold} is defined as a non async agent`);
+    }
+    if (args.length) {
+      this.children[name].log(...args);
+    }
+    return this.children[name];
   }
 
   resolve(...args) {
@@ -114,7 +115,7 @@ class Agent {
           resolveLog.success(...args);
         }
       } else {
-        this.internalWarn(`Trying to resolve an already ${this.logItem.status} async agent`);
+        this.internalWarn(`Trying to resolve an already {bold}${this.logItem.status}{/bold} async agent`);
       }
     } else {
       this.internalWarn('Trying to resolve a non async agent');
@@ -136,7 +137,7 @@ class Agent {
           rejectLog.error(...args);
         }
       } else {
-        this.internalWarn(`Trying to reject an already ${this.logItem.status} async agent`);
+        this.internalWarn(`Trying to reject an already {bold}${this.logItem.status}{/bold} async agent`);
       }
     } else {
       this.internalWarn('Trying to reject a non async agent');
