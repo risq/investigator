@@ -3,10 +3,8 @@ var _createClass = (function () { function defineProperties(target, props) { for
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('transceiver'), require('blessed'), require('dateformat'), require('json-prune'), require('shortid')) : typeof define === 'function' && define.amd ? define(['transceiver', 'blessed', 'dateformat', 'json-prune', 'shortid'], factory) : global.investigator = factory(global.transceiver, global.blessed, global.dateFormat, global.prune, global.shortid);
-})(this, function (transceiver, blessed, dateFormat, prune, shortid) {
-  'use strict';
-
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory(require('transceiver'), require('blessed'), require('dateformat'), require('json-prune'), require('path'), require('app-root-path'), require('shortid'), require('stack-trace')) : typeof define === 'function' && define.amd ? define(['transceiver', 'blessed', 'dateformat', 'json-prune', 'path', 'app-root-path', 'shortid', 'stack-trace'], factory) : global.investigator = factory(global.transceiver, global.blessed, global.dateFormat, global.prune, global.path, global.appRoot, global.shortid, global.stack_trace);
+})(this, function (transceiver, blessed, dateFormat, _prune, path, appRoot, shortid, stack_trace) {
   'use strict';
 
   var LogsList = (function () {
@@ -27,6 +25,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         tags: true,
         keys: true,
         mouse: true,
+        scrollbar: {
+          bg: 'magenta'
+        },
         style: {
           selected: {
             fg: 'black',
@@ -40,6 +41,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           _this.autoScroll = !_this.autoScroll;
         } else if (key.name === 'b') {
           _this.scrollToBottom();
+          transceiver.request('ui', 'render');
         } else {
           _this.autoScroll = false;
         }
@@ -107,8 +109,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return LogsList;
   })();
 
-  'use strict';
-
   var logDetails = (function () {
     function logDetails() {
       _classCallCheck(this, logDetails);
@@ -152,7 +152,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'renderType',
       value: function renderType(log) {
         if (log.type === 'root') {
-          return '{magenta-fg}{bold}ROOT{/bold}{/magenta-fg}\n';
+          return '{magenta-fg}{bold}ROOT NODE{/bold}{/magenta-fg}\n';
         }
         if (log.type === 'success') {
           return '{green-fg}✔ {bold}SUCCESS{/bold}{/green-fg}\n';
@@ -163,18 +163,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (log.type === 'warn') {
           return '{yellow-fg}! {bold}WARN{/bold}{/red-fg}\n';
         }
-        if (log.type === 'child') {
-          return '{grey-fg}{bold}CHILD{/bold}{/grey-fg}\n';
+        if (log.type === 'node') {
+          return '{grey-fg}{bold}NODE{/bold}{/grey-fg}\n';
         }
         if (log.type === 'async') {
           if (log.status === 'resolved') {
-            return '{bold}{green-fg}ASYNC CHILD{/bold} (RESOLVED ✔){/green-fg}\n';
+            return '{bold}{green-fg}ASYNC NODE{/bold} (RESOLVED ✔){/green-fg}\n';
           }
           if (log.status === 'rejected') {
-            return '{bold}{red-fg}ASYNC CHILD{/bold} (REJECTED ✘){/red-fg}\n';
+            return '{bold}{red-fg}ASYNC NODE{/bold} (REJECTED ✘){/red-fg}\n';
           }
           if (log.status === 'pending') {
-            return '{cyan-fg}{bold}ASYNC CHILD{/bold} (PENDING ⌛){/cyan-fg}\n';
+            return '{cyan-fg}{bold}ASYNC NODE{/bold} (PENDING ⌛){/cyan-fg}\n';
           }
         }
         if (log.type === 'info') {
@@ -262,10 +262,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   }
 
   Tree.prototype.walk = function (node, treeDepth) {
-
     var lines = [];
 
-    if (!node.parent) node.parent = null;
+    if (!node.parent) {
+      node.parent = null;
+    }
 
     if (treeDepth == '' && node.name) {
       this.lineNbr = 0;
@@ -280,22 +281,34 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       var i = 0;
 
-      if (typeof node.children == 'function') node.childrenContent = node.children(node);
+      if (typeof node.children == 'function') {
+        node.childrenContent = node.children(node);
+      }
 
-      if (!node.childrenContent) node.childrenContent = node.children;
+      if (!node.childrenContent) {
+        node.childrenContent = node.children;
+      }
 
       for (var child in node.childrenContent) {
 
-        if (!node.childrenContent[child].name) node.childrenContent[child].name = child;
+        if (!node.childrenContent[child].name) {
+          node.childrenContent[child].name = child;
+        }
 
         var childIndex = child;
         child = node.childrenContent[child];
         child.parent = node;
         child.position = i++;
 
-        if (typeof child.extended == 'undefined') child.extended = this.options.extended;
+        if (typeof child.extended == 'undefined') {
+          child.extended = this.options.extended;
+        }
 
-        if (typeof child.children == 'function') child.childrenContent = child.children(child);else child.childrenContent = child.children;
+        if (typeof child.children == 'function') {
+          child.childrenContent = child.children(child);
+        } else {
+          child.childrenContent = child.children;
+        }
 
         var isLastChild = child.position == Object.keys(child.parent.childrenContent).length - 1;
         var tree;
@@ -340,7 +353,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   };
 
   Tree.prototype.render = function () {
-    if (this.screen.focused == this.rows) this.rows.focus();
+    if (this.screen.focused == this.rows) {
+      this.rows.focus();
+    }
 
     this.rows.width = this.width - 3;
     this.rows.height = this.height - 3;
@@ -362,11 +377,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
   var ui_tree = Tree;
 
-  var MAX_DEPTH = 7;
-
-  var Inspecter = (function () {
-    function Inspecter() {
-      _classCallCheck(this, Inspecter);
+  var Inspector = (function () {
+    function Inspector() {
+      _classCallCheck(this, Inspector);
 
       this.channel = transceiver.channel('log');
 
@@ -376,7 +389,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         width: '90%',
         height: '75%',
         hidden: true,
-        label: 'Inspecter',
+        label: 'Inspector',
         tags: true,
         border: {
           type: 'line'
@@ -395,22 +408,57 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       });
     }
 
-    _createClass(Inspecter, [{
+    _createClass(Inspector, [{
       key: 'open',
       value: function open(selectedLog) {
-        if (!selectedLog || !selectedLog.data) {
+        if (!selectedLog || !selectedLog.data && !selectedLog.stackTrace) {
           return;
         }
         this.opened = true;
         this.element.show();
         this.element.focus();
-        this.element.setData(this.formatData(JSON.parse(prune(selectedLog.data, MAX_DEPTH))));
+        this.element.setData(this.prepareData(selectedLog));
       }
     }, {
       key: 'close',
       value: function close() {
         this.opened = false;
         this.element.hide();
+      }
+    }, {
+      key: 'prepareData',
+      value: function prepareData(log) {
+        var content = {};
+        if (log.data) {
+          content.data = JSON.parse(_prune(log.data, {
+            depthDecr: 7,
+            replacer: function replacer(value, defaultValue, circular) {
+              if (typeof value === 'function') {
+                return '"Function [pruned]"';
+              }
+              if (Array.isArray(value)) {
+                return '"Array (' + value.length + ') [pruned]"';
+              }
+              if (typeof value === 'object') {
+                return '"Object [pruned]"';
+              }
+              return defaultValue;
+            }
+          }));
+        }
+
+        if (log.stackTrace) {
+          content['stack trace'] = log.stackTrace.map(function (callsite) {
+            var relativePath = path.relative(appRoot.toString(), callsite.file);
+            return {
+              type: callsite.type,
+              'function': callsite['function'],
+              method: callsite.method,
+              file: relativePath + ':{yellow-fg}' + callsite.line + '{/yellow-fg}:{yellow-fg}' + callsite.column + '{/yellow-fg}'
+            };
+          });
+        }
+        return this.formatData(content);
       }
     }, {
       key: 'formatData',
@@ -423,12 +471,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (typeof data === 'object') {
           if (data !== null) {
             var _ret = (function () {
-              var type = Array.isArray(data) ? '[Array]' : '[Object]';
-              var keyName = key ? key + ' ' : '';
+              var name = undefined;
+              var extended = undefined;
+
+              if (depth === 2) {
+                name = '{yellow-fg}{bold}' + key.toUpperCase() + '{/bold}{/yellow-fg} {magenta-fg}(' + data.length + '){/magenta-fg}';
+                extended = key === 'data';
+              } else {
+                var type = Array.isArray(data) ? '[Array] {magenta-fg}(' + data.length + '){/magenta-fg}' : '[Object]';
+                name = '{blue-fg}{bold}' + (key ? key + ' ' : '') + '{/bold}' + type + '{/blue-fg}';
+                extended = depth < 4;
+              }
               var newObj = {
                 children: {},
-                name: '{blue-fg}{bold}' + keyName + '{/bold}' + type + '{/blue-fg}',
-                extended: depth < 3
+                name: name,
+                extended: extended
               };
               Object.keys(data).forEach(function (key) {
                 var child = _this2.formatData(data[key], key, depth);
@@ -465,7 +522,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       }
     }]);
 
-    return Inspecter;
+    return Inspector;
   })();
 
   var Ui = (function () {
@@ -481,7 +538,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
       this.logsList = new LogsList();
       this.logDetails = new logDetails();
-      this.inspecter = new Inspecter();
+      this.inspector = new Inspector();
 
       this.separator = blessed.line({
         bottom: 6,
@@ -491,7 +548,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       this.screen.append(this.logsList.element);
       this.screen.append(this.logDetails.element);
       this.screen.append(this.separator);
-      this.screen.append(this.inspecter.element);
+      this.screen.append(this.inspector.element);
 
       this.logsList.element.focus();
 
@@ -499,7 +556,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return process.exit(0);
       });
 
-      this.screen.key(['i'], this.toggleInspecter.bind(this));
+      this.screen.key(['i'], this.toggleInspector.bind(this));
 
       this.screen.render();
 
@@ -509,13 +566,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     _createClass(Ui, [{
-      key: 'toggleInspecter',
-      value: function toggleInspecter() {
-        if (this.inspecter.opened) {
-          this.inspecter.close();
+      key: 'toggleInspector',
+      value: function toggleInspector() {
+        if (this.inspector.opened) {
+          this.inspector.close();
           this.logsList.focus();
         } else {
-          this.inspecter.open(this.logsList.selectedLog);
+          this.inspector.open(this.logsList.selectedLog);
         }
         this.screen.render();
       }
@@ -524,26 +581,35 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return Ui;
   })();
 
-  'use strict';
-
   var LogItem = (function () {
-    function LogItem(options) {
+    function LogItem(_ref) {
+      var name = _ref.name;
+      var type = _ref.type;
+      var status = _ref.status;
+      var parent = _ref.parent;
+      var data = _ref.data;
+      var message = _ref.message;
+      var stackTrace = _ref.stackTrace;
+      var _ref$date = _ref.date;
+      var date = _ref$date === undefined ? Date.now() : _ref$date;
+
       _classCallCheck(this, LogItem);
 
       this.id = shortid.generate();
-      this.data = options.data;
-      this.type = options.type;
-      this.status = options.status;
-      this.message = options.message;
-      this.name = options.name;
-      this.date = options.date || Date.now();
-      this.channel = transceiver.channel('log');
+      this.name = name;
+      this.type = type;
+      this.status = status;
+      this.data = data;
+      this.message = message;
+      this.stackTrace = stackTrace;
+      this.date = date;
       this.children = [];
+      this.channel = transceiver.channel('log');
 
-      if (options.parent) {
-        this.depth = options.parent.depth + 1;
-        this.parent = options.parent;
-        this.previousLog = options.parent.getLastChild() || options.parent;
+      if (parent) {
+        this.depth = parent.depth + 1;
+        this.parent = parent;
+        this.previousLog = parent.getLastChild() || parent;
         this.relativeDuration = this.getRelativeDuration();
         this.parent.addChild(this);
       } else {
@@ -564,7 +630,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'render',
       value: function render() {
-        var message = '' + this.renderState() + this.renderName() + this.renderDate() + this.renderMessage() + this.renderData() + this.renderDuration();
+        var message = '' + this.renderState() + this.renderName() + this.renderMessage() + this.renderData() + this.renderDate() + this.renderDuration();
         for (var i = 0; i < this.depth; i++) {
           message = '    ' + message;
         }
@@ -640,10 +706,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'renderValue',
       value: function renderValue(value) {
         if (Array.isArray(value)) {
-          return '{cyan-fg}' + prune(value, 2, 8).split('"-pruned-"').join(' ...') + '{/cyan-fg}';
+          return '{cyan-fg}' + this.prune(value) + '{/cyan-fg}';
         }
         if (typeof value === 'object') {
-          return '{blue-fg}' + prune(value, 2, 8).split('"-pruned-"').join(' ...') + '{/blue-fg}';
+          return '{blue-fg}' + this.prune(value) + '{/blue-fg}';
         }
         if (typeof value === 'function') {
           return '{red-fg}{bold}[Function]{/bold}{red-fg}';
@@ -741,38 +807,56 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.status = status;
         this.update();
       }
+    }, {
+      key: 'prune',
+      value: function prune(value) {
+        return _prune(value, {
+          depthDecr: 2,
+          arrayMaxLength: 8,
+          prunedString: ' [...]'
+        });
+      }
     }]);
 
     return LogItem;
   })();
 
   var Agent = (function () {
-    function Agent(name) {
-      var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+    function Agent(_ref2) {
+      var name = _ref2.name;
+      var type = _ref2.type;
+      var status = _ref2.status;
+      var data = _ref2.data;
+      var message = _ref2.message;
+      var _ref2$isAsync = _ref2.isAsync;
+      var isAsync = _ref2$isAsync === undefined ? false : _ref2$isAsync;
+      var ancestors = _ref2.ancestors;
 
       _classCallCheck(this, Agent);
 
       this.name = name;
       this.children = {};
-      this.isAsync = options.isAsync ? true : false;
+      this.isAsync = isAsync;
       this.asyncState = this.isAsync ? 'pending' : null;
-      this.type = options.type;
-      this.status = options.status;
-      if (!options.ancestors) {
+      this.type = type;
+      this.status = status;
+
+      if (!ancestors) {
         this.ancestors = [];
         this.isRoot = true;
       } else {
-        this.ancestors = options.ancestors;
+        this.ancestors = ancestors;
         this.parent = this.ancestors[this.ancestors.length - 1];
       }
 
       this.logItem = new LogItem({
         name: this.name,
-        data: options.data,
-        message: options.message,
+        type: this.type,
         status: this.status,
         parent: this.parent ? this.parent.logItem : null,
-        type: this.type
+        data: data,
+        message: message,
+        stackTrace: this.generateStackTrace(stack_trace.get())
       });
 
       return this;
@@ -785,9 +869,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           args[_key] = arguments[_key];
         }
 
-        new Agent(null, {
-          data: args,
+        new Agent({
           type: 'info',
+          data: args,
           ancestors: this.ancestors.concat(this)
         });
         return this;
@@ -799,9 +883,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           args[_key2] = arguments[_key2];
         }
 
-        new Agent(null, {
-          data: args,
+        new Agent({
           type: 'warn',
+          data: args,
           ancestors: this.ancestors.concat(this)
         });
         return this;
@@ -813,9 +897,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           args[_key3] = arguments[_key3];
         }
 
-        new Agent(null, {
-          data: args,
+        new Agent({
           type: 'success',
+          data: args,
           ancestors: this.ancestors.concat(this)
         });
         return this;
@@ -827,9 +911,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           args[_key4] = arguments[_key4];
         }
 
-        new Agent(null, {
-          data: args,
+        new Agent({
           type: 'error',
+          data: args,
           ancestors: this.ancestors.concat(this)
         });
         return this;
@@ -837,11 +921,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'child',
       value: function child(name) {
-        // console.log(this.ancestors, this)
         if (!this.children[name]) {
-          this.children[name] = new Agent(name, {
-            ancestors: this.ancestors.concat(this),
-            type: 'child'
+          this.children[name] = new Agent({
+            name: name,
+            type: 'node',
+            ancestors: this.ancestors.concat(this)
           });
         }
 
@@ -860,26 +944,28 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'async',
       value: function async(name) {
         if (!this.children[name]) {
-          this.children[name] = new Agent(name, {
-            isAsync: true,
+          this.children[name] = new Agent({
+            name: name,
             type: 'async',
             status: 'pending',
+            isAsync: true,
             ancestors: this.ancestors.concat(this)
           });
-
-          for (var _len6 = arguments.length, args = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
-            args[_key6 - 1] = arguments[_key6];
-          }
-
-          if (args.length) {
-            var _children$name2;
-
-            (_children$name2 = this.children[name]).log.apply(_children$name2, args);
-          }
-          return this.children[name];
         }
-        this.internalWarn('async(' + name + '): child agent has already been defined');
-        return this;
+        if (!this.children[name].isAsync) {
+          this.internalWarn('Child agent {bold}' + name + '{/bold} is defined as a non async agent');
+        }
+
+        for (var _len6 = arguments.length, args = Array(_len6 > 1 ? _len6 - 1 : 0), _key6 = 1; _key6 < _len6; _key6++) {
+          args[_key6 - 1] = arguments[_key6];
+        }
+
+        if (args.length) {
+          var _children$name2;
+
+          (_children$name2 = this.children[name]).log.apply(_children$name2, args);
+        }
+        return this.children[name];
       }
     }, {
       key: 'resolve',
@@ -887,10 +973,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (this.isAsync) {
           if (this.logItem.status === 'pending') {
             this.logItem.setStatus('resolved');
-            var resolveLog = new Agent(this.name, {
-              ancestors: this.ancestors.concat(this),
+            var resolveLog = new Agent({
+              name: this.name,
               type: 'success',
-              message: 'resolved'
+              message: 'resolved',
+              ancestors: this.ancestors.concat(this)
             });
 
             for (var _len7 = arguments.length, args = Array(_len7), _key7 = 0; _key7 < _len7; _key7++) {
@@ -901,7 +988,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               resolveLog.success.apply(resolveLog, args);
             }
           } else {
-            this.internalWarn('Trying to resolve an already ' + this.logItem.status + ' async agent');
+            this.internalWarn('Trying to resolve an already {bold}' + this.logItem.status + '{/bold} async agent');
           }
         } else {
           this.internalWarn('Trying to resolve a non async agent');
@@ -914,10 +1001,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (this.isAsync) {
           if (this.logItem.status === 'pending') {
             this.logItem.setStatus('rejected');
-            var rejectLog = new Agent(this.name, {
-              ancestors: this.ancestors.concat(this),
+            var rejectLog = new Agent({
+              name: this.name,
               type: 'error',
-              message: 'rejected'
+              message: 'rejected',
+              ancestors: this.ancestors.concat(this)
             });
 
             for (var _len8 = arguments.length, args = Array(_len8), _key8 = 0; _key8 < _len8; _key8++) {
@@ -928,7 +1016,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
               rejectLog.error.apply(rejectLog, args);
             }
           } else {
-            this.internalWarn('Trying to reject an already ' + this.logItem.status + ' async agent');
+            this.internalWarn('Trying to reject an already {bold}' + this.logItem.status + '{/bold} async agent');
           }
         } else {
           this.internalWarn('Trying to reject a non async agent');
@@ -938,10 +1026,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'internalWarn',
       value: function internalWarn(message) {
-        new Agent(this.name, {
-          ancestors: this.ancestors.concat(this),
+        new Agent({
+          name: this.name,
           type: 'warn',
-          message: message
+          message: message,
+          ancestors: this.ancestors.concat(this)
         });
       }
     }, {
@@ -950,6 +1039,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return this.ancestors.map(function (ancestor) {
           return ancestor.name;
         });
+      }
+    }, {
+      key: 'generateStackTrace',
+      value: function generateStackTrace(trace) {
+        var stackTrace = [];
+        for (var i = 0; i < 5; i++) {
+          stackTrace.push({
+            type: trace[i].getTypeName(),
+            'function': trace[i].getFunctionName(),
+            method: trace[i].getMethodName(),
+            file: trace[i].getFileName(),
+            line: trace[i].getLineNumber(),
+            column: trace[i].getColumnNumber()
+          });
+        }
+        return stackTrace;
       }
     }]);
 
@@ -961,9 +1066,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       args[_key9 - 1] = arguments[_key9];
     }
 
-    return new Agent(name, {
-      data: args.length ? args : undefined,
-      type: 'root'
+    return new Agent({
+      name: name,
+      type: 'root',
+      data: args.length ? args : undefined
     });
   };
 
