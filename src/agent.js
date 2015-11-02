@@ -1,5 +1,6 @@
 import shortid from 'shortid';
 import transceiver from 'transceiver';
+import stackTrace from 'stack-trace';
 
 import LogItem from './ui/logItem';
 
@@ -27,6 +28,7 @@ class Agent {
       parent: this.parent ? this.parent.logItem : null,
       data: data,
       message: message,
+      stackTrace: this.generateStackTrace(stackTrace.get()),
     });
 
     return this;
@@ -156,6 +158,21 @@ class Agent {
 
   getAncestorsNames() {
     return this.ancestors.map(ancestor => ancestor.name);
+  }
+
+  generateStackTrace(trace) {
+    const stackTrace = [];
+    for (let i = 0; i < 5; i++) {
+      stackTrace.push({
+        type: trace[i].getTypeName(),
+        function: trace[i].getFunctionName(),
+        method: trace[i].getMethodName(),
+        file: trace[i].getFileName(),
+        line: trace[i].getLineNumber(),
+        column: trace[i].getColumnNumber(),
+      });
+    }
+    return stackTrace;
   }
 }
 

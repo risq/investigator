@@ -5,13 +5,14 @@ import prune from 'json-prune';
 import dateFormat from 'dateformat';
 
 export default class LogItem {
-  constructor({name, type, status, parent, data, message, date = Date.now()}) {
+  constructor({name, type, status, parent, data, message, stackTrace, date = Date.now()}) {
     this.id = shortid.generate();
     this.name = name;
     this.type = type;
     this.status = status;
     this.data = data;
     this.message = message;
+    this.stackTrace = stackTrace;
     this.date = date;
     this.children = [];
     this.channel = transceiver.channel('log');
