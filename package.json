@@ -1,7 +1,7 @@
 {
   "name": "investigator",
   "version": "0.1.0",
-  "description": "",
+  "description": "Interactive and asynchronous logging tool for Node.js. An easier way to log & debug complex requests directly from the command line. Still experimental !",
   "main": "dist/investigator.js",
   "scripts": {
     "test": "gulp",
