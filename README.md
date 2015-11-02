@@ -164,12 +164,12 @@ onRequest(req, res) {
 ##### `agent.resolve(data [, data])` -> `Agent`
 Resolves an **async** agent. Log data parameters under the given agent node, as a success. Returns the same agent (so it can be chained).
 
-An async agent can only be resolvded or rejected once.
+An async agent can only be resolved or rejected once.
 
 ##### `agent.reject(data [, data])` -> `Agent`
 Resolves an **async** agent. Log data parameters under the given agent node, as an error. Returns the same agent (so it can be chained).
 
-An async agent can only be resolvded or rejected once.
+An async agent can only be resolved or rejected once.
 
 ## Contributing
 Feel free to contribute ! Issues and pull requests are highly welcomed and appreciated.
