@@ -54,7 +54,7 @@ Use `npm install investigator` to install locally. See [Usage](#usage) and [API 
 ## Shortcuts
 In the command line interface, the following shortcuts are available:
 - Scroll up and down with `up arrow`, `down arrow`, or mouse wheel. You may also click on a row to select it.
-- Open **Inspecter** with `i` (inspect the currently selected row).
+- Open **Inspector** with `i` (inspect the currently selected row).
 - Scroll to bottom with `b`
 - Enable auto-scroll with `s`. Disable by pressing an arrow key.
 
@@ -72,6 +72,7 @@ You can build the project (transpiling to ES5) with `npm run build`.
 - [ ] Improve UI, navigation & controls in the CLI.
 - [ ] Add some performance monitoring.
 - [ ] Improve CLI performance for long time logging (avoid memory leaks).
+- [ ] Allow client-side logging via WebSockets.
 
 ## API Reference
 ### Investigator
